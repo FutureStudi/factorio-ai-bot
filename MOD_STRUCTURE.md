@@ -30,9 +30,9 @@ Defines metadata for Factorio to load the mod. Example fields:
   "version": "0.4.3",
   "title": "Factorio AI Bot",
   "author": "Creater",
-  "factorio_version": "1.1",
+  "factorio_version": "2.0.41",
   "description": "An AI bot for automation in Factorio",
-  "dependencies": []
+  "dependencies": ["base >= 2.0.41"]
 }
 ```
 
@@ -70,7 +70,7 @@ The AI bot makes decisions and attempts to simulate movement outside Factorio.
 - Uses `log()` instead of banned file operations
 - In-game messages are debug-friendly via `game.print()`
 - Global table usage (`global.ai_log`) ensures state persistence
-- Compatible with Factorio 1.1+
+- Compatible with Factorio 2.0.41+
 
 ---
 
