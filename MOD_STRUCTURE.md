@@ -29,7 +29,7 @@ Defines metadata for Factorio to load the mod. Example fields:
   "name": "factorio_ai_bot",
   "version": "0.4.3",
   "title": "Factorio AI Bot",
-  "author": "Lance",
+  "author": "Creater",
   "factorio_version": "1.1",
   "description": "An AI bot for automation in Factorio",
   "dependencies": []
