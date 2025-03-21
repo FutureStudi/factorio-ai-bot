@@ -1,0 +1,140 @@
+
+# Factorio AI Bot Development Documentation
+
+## Overview
+This document details the development history of the **Factorio AI Bot**, including both the **Factorio mod** and the **C++ external script** that controls the AI movement. It includes version histories, code snapshots, and notes on changes and improvements.
+
+---
+
+# **1. Factorio AI Bot Mod History**
+
+## **Version 0.1.5**  
+- **Capabilities:**  
+  - Successfully wrote AI data to `factorio_ai_data.txt` using `game.write_file()`.  
+  - C++ script successfully read and processed AI data for movement.  
+- **Errors Encountered:** None (Stable)
+
+```lua
+script.on_event(defines.events.on_tick, function(event)
+    if event.tick % 300 == 0 then
+        local player = game.players[1]
+        if player then
+            game.write_file("factorio_ai_data.txt", "[AI Data] Player at: " .. player.position.x .. "," .. player.position.y, false)
+        end
+    end
+end)
+```
+
+---
+
+## **Version 0.2.7**
+- **Capabilities:**  
+  - Same as 0.1.5 but **refactored data output format** to be more structured.  
+  - Improved movement logic in the C++ script.  
+- **Errors Encountered:** None (Stable)
+
+```lua
+script.on_event(defines.events.on_tick, function(event)
+    if event.tick % 300 == 0 then
+        local player = game.players[1]
+        if player then
+            local data = string.format("[AI Data] Player at: x=%.2f, y=%.2f\n", player.position.x, player.position.y)
+            game.write_file("factorio_ai_data.txt", data, false)
+        end
+    end
+end)
+```
+
+---
+
+## **Version 0.3.6**  
+- **Capabilities:**  
+  - Attempted to transition to `game.read_file()` to process AI logs.  
+- **Errors Encountered:**  
+  - **`LuaGameScript doesn't contain key read_file` error caused Factorio to crash.**  
+
+```lua
+function trim_file(file_path, max_lines)
+    local file_contents = game.read_file(file_path)  -- This API call is INVALID
+    if not file_contents then return end
+
+    local lines = {}
+    for line in file_contents:gmatch("[^\r\n]+") do
+        table.insert(lines, line)
+    end
+
+    if #lines > max_lines then
+        local trimmed_data = table.concat(lines, "\n", #lines - max_lines + 1, #lines)
+        game.write_file(file_path, trimmed_data, false)
+    end
+end
+```
+
+---
+
+## **Version 0.4.3 (Current Version)**  
+- **Capabilities:**  
+  - Uses `game.print()` for **in-game debug messages**.  
+  - Uses `log()` for **external tracking via `factorio-current.log`**.  
+  - Fully removed `game.write_file()` to prevent crashes.  
+- **Errors Encountered:** None (Stable)
+
+```lua
+script.on_event(defines.events.on_tick, function(event)
+    if event.tick % 300 == 0 then
+        local player = game.players[1]
+        if player then
+            local data = string.format("[DEBUG] Player Position: x=%.2f, y=%.2f\n", player.position.x, player.position.y)
+            game.print(data)  -- Outputs to in-game console
+            log(data)  -- Logs to factorio-current.log
+        end
+    end
+end)
+```
+
+---
+
+# **2. C++ AI Bot Script Versions**
+
+## **Version 0.2.7 (First Working Version)**
+- Successfully read `factorio_ai_data.txt` for movement.
+
+## **Version 0.3.6 - 0.4.0 (Broken Due to Mod Changes)**
+- Stopped working because `factorio_ai_data.txt` was removed.
+
+## **Version 0.4.3 (Current Version)**
+- **Updated to read from BOTH `factorio-current.log` and `factorio_ai_data.txt` (if available).**  
+- **Fixed regex pattern to match actual debug output.**  
+
+```cpp
+// Fixed C++ AI Bot (Version 0.4.3)
+const std::vector<std::string> LOG_LOCATIONS = {
+    "C:/Users/Lance/AppData/Roaming/Factorio/factorio-current.log",
+    "C:/Users/Lance/AppData/Roaming/Factorio/script-output/factorio_ai_data.txt"
+};
+
+std::regex playerPattern(R"(Player Position\]: x=(-?\d+\.\d+), y=(-?\d+\.\d+))");
+
+for (const auto& filePath : LOG_LOCATIONS) {
+    std::ifstream logFile(filePath);
+    if (!logFile.is_open()) continue;
+
+    std::string line;
+    while (getline(logFile, line)) {
+        std::smatch match;
+        if (std::regex_search(line, match, playerPattern)) {
+            Player playerPos;
+            playerPos.x = std::stof(match[1].str());
+            playerPos.y = std::stof(match[2].str());
+            std::cout << "[DEBUG] Detected Player Position: x=" << playerPos.x << ", y=" << playerPos.y << std::endl;
+        }
+    }
+    logFile.close();
+}
+```
+
+---
+
+# **3. Next Steps**
+- **Verify AI tracking continues working in real-time.**  
+- **Ensure Factorio log structure remains stable in future updates.**  
