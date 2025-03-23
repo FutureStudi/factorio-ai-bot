@@ -1,83 +1,56 @@
 # Factorio AI Bot 🤖
 
-An AI bot that reads Factorio logs and simulates player movement using external keyboard input. The project combines a custom Factorio mod with a C++ AI script.
+A C++ bot for automating player movement and mining in Factorio by combining log file reading and computer vision detection.
 
----
+## 🔧 Features
 
-## 📦 Project Structure
+### Movement + Mining
+- Reads player position and resource positions from Factorio logs.
+- Prioritizes resources (coal > iron > copper > stone).
+- Simulates WASD movement toward nearby resources.
+- Mines when within 5 tiles using mouse input (simulated left click).
 
-- **Factorio Mod**: Logs player and resource positions
-- **C++ AI Bot**: Reads log files, ranks resources, simulates `WASD` input to move toward high-priority targets
+### Vision System (WIP)
+- Captures the full desktop screen using GDI.
+- Uses OpenCV template matching to locate coal resources on screen.
+- Loops through up to 64 coal tile templates for matching.
+- Draws a red box on the detected coal tile in `match_debug.png`.
 
----
+## 📂 File Structure
 
-## 🔁 AI Logic
+- `coal_template_X.png`: Template images for matching.
+- `factorio_ai_screen.png`: Screenshot of the current desktop view.
+- `match_debug.png`: Output screenshot with detected coal marked.
+- `ai_bot.cpp`: Main AI logic script.
+- `README.md`, `CHANGELOG.md`: Project info and version history.
 
-1. Read recent lines from `factorio-current.log`
-2. Parse:
-   - `[AI Player Position]`: Player's current location
-   - `[AI Data Chunk]`: Resource name and coordinates
-3. Score each resource based on:
-   ```
-   score = priority / (distance + 1.0)
-   ```
-4. Select the best-scoring resource
-5. Move the player in the best direction using `SendInput` and **scan code injection**
+## 🔁 How to Run
 
----
+1. Run Factorio in windowed/borderless mode with coal on screen.
+2. Run the AI bot EXE as Administrator.
+3. The bot will:
+    - Wait 3 seconds
+    - Capture the desktop
+    - Attempt coal detection using OpenCV
+    - Print the best match location and draw it
 
-## 🧠 Prioritization Logic
+## 🧪 Testing Tips
 
-```
-coal        = 4
-iron-ore    = 3
-copper-ore  = 2
-stone       = 1
-```
+- Ensure camera is zoomed to default.
+- Coal must be visible and not covered by UI.
+- Match confidence thresholds can be tuned in code.
+- Use `match_debug.png` to verify accuracy.
 
----
+## 🛠 Requirements
 
-## ✅ Version v0.7 (Latest)
+- OpenCV 4.11.0 with Debug libraries (e.g., `opencv_world4110d.dll`)
+- C++17+
+- Windows 10/11
+- GDI enabled
 
-- ✅ Uses scan codes via `SendInput()` to bypass Factorio input blocking
-- ✅ Moves in steps of 5 simulated keypresses per direction
-- ✅ Calculates and updates distance to target in real-time
-- ✅ Scans only the last 500 lines of logs to prevent stale data overload
-- ✅ Logs movement and target details to console for debugging
+## 🚧 In Progress
 
----
-
-## 🗂 Directory Layout
-
-```
-factorio-ai-bot/
-├── cpp/
-│   ├── ai_bot_vv0.6.cpp   # Crude single-tap movement
-│   └── ai_bot_vv0.7.cpp   # Repeated movement logic (current)
-├── docs/
-│   ├── cpp_version_history.md
-│   ├── mod_version_history.md
-│   └── MOD_STRUCTURE.md
-├── Factorio Mod Versions/
-│   └── factorio_ai_bot_0.x.x.zip
-├── README.md
-└── CHANGELOG.md
-```
-
----
-
-## 🔧 Requirements
-
-- Factorio (2.0.41+)
-- Windows OS (due to `SendInput`)
-- Run C++ bot **as Administrator**
-- Use **windowed** or **borderless** mode for input simulation
-
----
-
-## 🚀 Roadmap
-
-- [ ] Add diagonal movement (press two keys simultaneously)
-- [ ] Implement proximity stop zone
-- [ ] Web-based UI dashboard
-- [ ] Auto-building infrastructure (miners, belts, etc.)
+- Vision-based resource matching
+- Inventory checks and management
+- Visual UI or override system
+- Support for additional resource types
