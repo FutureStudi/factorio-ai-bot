@@ -49,6 +49,27 @@
 
 ---
 
+### 🧠 Version 0.7
+- ✅ Fixed movement using scan code-based `SendInput` (moves player in-game!)
+- ✅ Added player distance checks before moving
+- ✅ Enabled diagonal WASD movement
+- ✅ Added `mineAtPosition()` to simulate left-click mining when near a resource
+- ✅ Introduced adjustable movement step size
+
+---
+
+### 🧠 Version 0.8
+- 🧠 Introduced GDI+ screenshot capture for Factorio window
+- 🖥️ Replaced `BitBlt` with `PrintWindow`, then full virtual desktop capture using `GetDC(NULL)`
+- 📸 Screenshot now covers all monitors
+- 🔍 Integrated OpenCV 4.11.0
+- 🔁 Scans up to 64 `coal_template_X.png` variations
+- ✅ Draws bounding box on best match and saves to `match_debug.png`
+- 🚦 Confidence thresholds (0.3 min template, 0.5 final match)
+- 🐌 Optimization added to speed up matching
+
+---
+
 ## 🔧 Known Fixes Across Versions
 
 - `game.read_file()` crash in mod v0.3.6 → Removed in v0.3.8
@@ -56,11 +77,4 @@
 - Broken `pressKey()` in v0.6 → Rewritten to use scan codes and corrected syntax
 - `PostMessage` not effective → Replaced with `AttachThreadInput` combo
 - `pressKey()` redefinition and syntax issues → Cleaned and compiled successfully
-
----
-
-## ✅ Status Summary
-
-- ✅ Resource reading & decision logic works
-- ❌ Movement blocked by Factorio’s input restrictions
-- 🧭 Path forward: use low-level input or integrate with vJoy
+- Factorio window screenshot captured black → fixed with full desktop GDI+ capture
