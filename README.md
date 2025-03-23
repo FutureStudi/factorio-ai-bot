@@ -68,7 +68,7 @@ factorio-ai-bot/
 
 ## 🔧 Requirements
 
-- Factorio (1.1+)
+- Factorio (2.0.41+)
 - Windows OS (due to `SendInput`)
 - Run C++ bot **as Administrator**
 - Use **windowed** or **borderless** mode for input simulation
