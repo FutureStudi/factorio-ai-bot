@@ -1,80 +1,83 @@
 # Factorio AI Bot 🤖
 
-This project is an AI assistant for the game [Factorio](https://www.factorio.com/). It reads game logs to analyze player position and nearby resources, then simulates movement using external automation techniques.
+An AI bot that reads Factorio logs and simulates player movement using external keyboard input. The project combines a custom Factorio mod with a C++ AI script.
 
 ---
 
-## 🧠 Project Overview
+## 📦 Project Structure
 
-The AI bot consists of two major components:
-
-### 1. 🧩 Factorio Mod
-- Logs player position and resource data every 5 seconds.
-- Outputs data to:
-  - `factorio-current.log` (via `log()`)
-  - In-game console (via `game.print()`)
-
-### 2. 🧠 C++ AI Script
-- Parses `factorio-current.log` and `factorio_ai_data.txt`
-- Extracts:
-  - Player position
-  - Resource positions with names
-- Selects the **highest priority resource** and moves the player toward it.
+- **Factorio Mod**: Logs player and resource positions
+- **C++ AI Bot**: Reads log files, ranks resources, simulates `WASD` input to move toward high-priority targets
 
 ---
 
-## 🔁 AI Logic Flow
+## 🔁 AI Logic
 
-1. Read latest log lines.
-2. Parse player and resource data using regex.
-3. Rank resources by:
-   - `score = priority / distance`
-4. Choose the best target.
-5. Simulate movement input (`W`, `A`, `S`, `D`) toward that resource.
-
----
-
-## 🔧 Current Limitations
-
-- Input simulation using `SendInput`, `PostMessage`, and `AttachThreadInput` does **not currently move the player** in Factorio due to input blocking.
-- External input drivers (e.g., vJoy, Interception) may be required for full automation.
+1. Read recent lines from `factorio-current.log`
+2. Parse:
+   - `[AI Player Position]`: Player's current location
+   - `[AI Data Chunk]`: Resource name and coordinates
+3. Score each resource based on:
+   ```
+   score = priority / (distance + 1.0)
+   ```
+4. Select the best-scoring resource
+5. Move the player in the best direction using `SendInput` and **scan code injection**
 
 ---
 
-## 🗂️ Project Structure
+## 🧠 Prioritization Logic
+
+```
+coal        = 4
+iron-ore    = 3
+copper-ore  = 2
+stone       = 1
+```
+
+---
+
+## ✅ Version v0.7 (Latest)
+
+- ✅ Uses scan codes via `SendInput()` to bypass Factorio input blocking
+- ✅ Moves in steps of 5 simulated keypresses per direction
+- ✅ Calculates and updates distance to target in real-time
+- ✅ Scans only the last 500 lines of logs to prevent stale data overload
+- ✅ Logs movement and target details to console for debugging
+
+---
+
+## 🗂 Directory Layout
 
 ```
 factorio-ai-bot/
-├── cpp/                    # C++ AI scripts
-│   ├── ai_bot_vv0.1.cpp
-│   ├── ...
-│   └── ai_bot_vv0.6.cpp
-├── mod/                    # Factorio mod files
-│   └── factorio_ai_bot_0.4.3.zip
+├── cpp/
+│   ├── ai_bot_vv0.6.cpp   # Crude single-tap movement
+│   └── ai_bot_vv0.7.cpp   # Repeated movement logic (current)
 ├── docs/
-│   └── Factorio_AI_Bot_Combined_Documentation.txt
-└── README.md
+│   ├── cpp_version_history.md
+│   ├── mod_version_history.md
+│   └── MOD_STRUCTURE.md
+├── Factorio Mod Versions/
+│   └── factorio_ai_bot_0.x.x.zip
+├── README.md
+└── CHANGELOG.md
 ```
 
 ---
 
-## 🚧 Version History
+## 🔧 Requirements
 
-- `v0.1` – Basic log parsing
-- `v0.4` – Reads both log sources
-- `v0.5` – Extracts player & resource data
-- `v0.6` – Implements prioritization + movement logic (input methods under testing)
-
----
-
-## 📌 Next Steps
-
-- Explore raw input injection using external libraries
-- Build a basic Web UI for live AI state monitoring
-- Add smarter pathfinding or terrain analysis
+- Factorio (1.1+)
+- Windows OS (due to `SendInput`)
+- Run C++ bot **as Administrator**
+- Use **windowed** or **borderless** mode for input simulation
 
 ---
 
-## 📜 License
+## 🚀 Roadmap
 
-MIT or custom license — add yours here.
+- [ ] Add diagonal movement (press two keys simultaneously)
+- [ ] Implement proximity stop zone
+- [ ] Web-based UI dashboard
+- [ ] Auto-building infrastructure (miners, belts, etc.)
